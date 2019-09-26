@@ -42,14 +42,19 @@ class ViewController: UIViewController {
         
         let resource = Resource<WeatherResult>(url: url)
         
-        URLRequest.load(resource: resource)
+        let search = URLRequest.load(resource: resource)
             .observeOn(MainScheduler.instance)
             .catchErrorJustReturn(WeatherResult.empty)
-            .subscribe(onNext: { (weatherResult) in
-                if let weatherResult = weatherResult {
-                    self.displayWeather(weatherResult.main)
-                }
-            }).disposed(by: disposeBag)
+            .filter { $0 != nil }
+            .map { $0! }
+        
+        search.map { "\($0.main.temp) ℃" }
+        .bind(to: self.temperatureLabel.rx.text)
+        .disposed(by: disposeBag)
+        
+        search.map { "\($0.main.humidity) %" }
+        .bind(to: self.humidityLabel.rx.text)
+        .disposed(by: disposeBag)
     }
 
     private func displayWeather(_ weather: Weather?) {
