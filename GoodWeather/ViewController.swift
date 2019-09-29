@@ -45,8 +45,6 @@ class ViewController: UIViewController {
         let search = URLRequest.load(resource: resource)
             .observeOn(MainScheduler.instance)
             .asDriver(onErrorJustReturn: WeatherResult.empty)
-            .filter { $0 != nil }
-            .map { $0! }
             
         search.map { "\($0.main.temp) ℃" }
         .drive(self.temperatureLabel.rx.text)
