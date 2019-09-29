@@ -44,6 +44,7 @@ class ViewController: UIViewController {
         
         let search = URLRequest.load(resource: resource)
             .observeOn(MainScheduler.instance)
+            .retry(3)
             .catchError { (error) -> Observable<WeatherResult> in
                 print(error.localizedDescription)
                 return Observable.just(WeatherResult.empty)
